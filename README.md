@@ -1,12 +1,12 @@
 # 🗺️ Mapa da Saúde de Minas Gerais
 
-Um sistema interativo de mapeamento geográfico que permite visualizar e analisar as regionais de saúde de Minas Gerais, incluindo cidades próximas e informações demográficas.
+Um sistema interativo de mapeamento geográfico que permite visualizar e analisar as regionais de Minas Gerais, incluindo cidades próximas e informações demográficas.
 
 ## ✨ Funcionalidades
 
 ### 🎯 Principais
 - **Mapa Interativo**: Visualização geográfica completa do estado de Minas Gerais
-- **Regionais de Saúde**: 7 regionais estratégicas marcadas no mapa
+- **Regionais**: 7 regionais estratégicas marcadas no mapa
 - **Cidades Próximas**: Sistema de busca automática de cidades próximas a cada regional
 - **Informações Demográficas**: População e dados das cidades
 - **Interface Responsiva**: Funciona em desktop e dispositivos móveis
@@ -95,7 +95,7 @@ mapa-saude-mg/
 
 ## 📊 Dados Incluídos
 
-### Regionais de Saúde (7)
+### Regionais
 - **Belo Horizonte** - Regional Metropolitana
 - **Montes Claros** - Regional Norte
 - **Governador Valadares** - Regional Vale do Rio Doce
@@ -143,38 +143,8 @@ npm run build
 # Configure GitHub Actions para deploy automático
 ```
 
-## 🤝 Contribuindo
-
-1. **Fork** o projeto
-2. **Crie** uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. **Commit** suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. **Push** para a branch (`git push origin feature/AmazingFeature`)
-5. **Abra** um Pull Request
-
 ## 📝 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
-
-## 👥 Autores
-
-- **Seu Nome** - *Desenvolvimento inicial* - [seu-usuario](https://github.com/seu-usuario)
-
-## 🙏 Agradecimentos
-
-- **IBGE** - Dados oficiais de municípios brasileiros
-- **OpenStreetMap** - Dados geográficos
-- **Leaflet** - Biblioteca de mapas interativos
-- **React** - Framework JavaScript
-
-## 📞 Suporte
-
-Se você encontrar algum problema ou tiver sugestões:
-
-1. **Abra uma Issue** no GitHub
-2. **Descreva** o problema detalhadamente
-3. **Inclua** screenshots se possível
-4. **Mencione** sua versão do navegador e sistema operacional
-
----
 
 **Desenvolvido com ❤️ para a saúde pública de Minas Gerais**
