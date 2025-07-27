@@ -1,0 +1,34 @@
+/* Fix for Leaflet default marker icons */
+.leaflet-default-icon-path {
+  background-image: url(https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png);
+}
+
+.leaflet-default-shadow-path {
+  background-image: url(https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png);
+}
+
+/* Ensure map container takes full height */
+.leaflet-container {
+  height: 100vh !important;
+  width: 100% !important;
+}
+
+/* Remove any default margins/padding that might interfere */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#root {
+  height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Override any conflicting styles */
+* {
+  box-sizing: border-box;
+} 
