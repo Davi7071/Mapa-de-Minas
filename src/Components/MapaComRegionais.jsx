@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Circle, Popup, Rectangle, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, CircleMarker, Circle, Popup, Rectangle, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
-import { REGIONAIS } from '../data/regionais';
+import { REGIONAIS, RAIO_PADRAO_KM } from '../data/regionais';
 import MUNICIPIOS from '../data/municipios-mg.json';
 import './MapaComRegionais.css';
 
@@ -149,9 +149,10 @@ const MapaComRegionais = () => {
   const [modoDesenho, setModoDesenho] = useState(false);
   const [pontoInicial, setPontoInicial] = useState(null);
   const [pontoAtual, setPontoAtual] = useState(null);
+  // Cada regional tem o seu raio de abrangência; cidades avulsas usam o padrão.
+  const [raioKm, setRaioKm] = useState(RAIO_PADRAO_KM);
 
   const cidades = MUNICIPIOS;
-  const raioKm = 50;
 
   // Criar ícones personalizados para as regionais
   const regionalIcon = useMemo(() => {
@@ -190,11 +191,13 @@ const MapaComRegionais = () => {
   // Handlers usando useCallback para evitar re-renders desnecessários
   const handleCidadeClick = useCallback((cidade) => {
     setCidadeSelecionada(cidade);
+    setRaioKm(RAIO_PADRAO_KM);
     setAreaSelecionada(null);
     setModoDesenho(false);
   }, []);
 
   const handleRegionalClick = useCallback((regional) => {
+    setRaioKm(regional.raioKm);
     // Encontrar a cidade base da regional
     const cidadeBase = cidades.find(cidade => cidade.nome === regional.cidadeBase);
     if (cidadeBase) {
@@ -249,6 +252,7 @@ const MapaComRegionais = () => {
   const ativarModoDesenho = useCallback(() => {
     setModoDesenho((ativo) => !ativo);
     setCidadeSelecionada(null);
+    setRaioKm(RAIO_PADRAO_KM);
     setAreaSelecionada(null);
     setPontoInicial(null);
     setPontoAtual(null);
@@ -256,6 +260,7 @@ const MapaComRegionais = () => {
 
   const limparSelecoes = useCallback(() => {
     setCidadeSelecionada(null);
+    setRaioKm(RAIO_PADRAO_KM);
     setAreaSelecionada(null);
     setModoDesenho(false);
     setPontoInicial(null);
@@ -298,6 +303,7 @@ const MapaComRegionais = () => {
           center={[-18.5, -44]}
           zoom={6.5}
           className="mapa"
+          preferCanvas
         >
           <MapEvents onClick={handleMapClick} onMouseMove={handleMapMouseMove} />
 
@@ -335,9 +341,16 @@ const MapaComRegionais = () => {
 
           {/* Marcadores das cidades */}
           {cidades.map((cidade) => (
-            <Marker
+            <CircleMarker
               key={cidade.codigo}
-              position={[cidade.lat, cidade.lng]}
+              center={[cidade.lat, cidade.lng]}
+              radius={4}
+              pathOptions={{
+                color: '#1565c0',
+                fillColor: '#1e88e5',
+                fillOpacity: 0.85,
+                weight: 1
+              }}
               eventHandlers={{
                 click: () => handleCidadeClick(cidade)
               }}
@@ -355,7 +368,7 @@ const MapaComRegionais = () => {
                   )}
                 </div>
               </Popup>
-            </Marker>
+            </CircleMarker>
           ))}
 
           {/* Círculo da cidade selecionada */}
@@ -376,8 +389,9 @@ const MapaComRegionais = () => {
           {REGIONAIS.map((reg) => (
             <React.Fragment key={reg.nome}>
               <Marker
-                position={[reg.coordenadas.lat + 0.01, reg.coordenadas.lng + 0.01]}
+                position={[reg.coordenadas.lat, reg.coordenadas.lng]}
                 icon={regionalIcon}
+                zIndexOffset={1000}
                 eventHandlers={{
                   click: () => handleRegionalClick(reg)
                 }}
