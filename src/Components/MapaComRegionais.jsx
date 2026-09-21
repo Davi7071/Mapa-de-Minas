@@ -3,20 +3,8 @@ import { MapContainer, TileLayer, Marker, CircleMarker, Circle, Popup, Rectangle
 import L from 'leaflet';
 import { REGIONAIS, RAIO_PADRAO_KM } from '../data/regionais';
 import MUNICIPIOS from '../data/municipios-mg.json';
+import { cidadesDentroDoRaio, cidadesDentroDaArea } from '../lib/geo';
 import './MapaComRegionais.css';
-
-// Distância em metros entre dois pontos (fórmula de Haversine).
-const calcularDistancia = (lat1, lon1, lat2, lon2) => {
-  const R = 6371; // Raio da Terra em km
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a =
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c * 1000;
-};
 
 // O MapContainer não aceita `eventHandlers`: os eventos do mapa só chegam via
 // hook, a partir de um componente renderizado dentro dele.
@@ -165,28 +153,16 @@ const MapaComRegionais = () => {
   }, []);
 
   // Calcular cidades próximas usando useMemo para performance
-  const cidadesProximas = useMemo(() => {
-    if (!cidadeSelecionada) return [];
-
-    return cidades.filter((c) => {
-      const distancia = calcularDistancia(
-        cidadeSelecionada.lat,
-        cidadeSelecionada.lng,
-        c.lat,
-        c.lng
-      );
-
-      return distancia <= raioKm * 1000 && c.codigo !== cidadeSelecionada.codigo;
-    });
-  }, [cidadeSelecionada, cidades, raioKm]);
+  const cidadesProximas = useMemo(
+    () => cidadesDentroDoRaio(cidades, cidadeSelecionada, raioKm),
+    [cidadeSelecionada, cidades, raioKm]
+  );
 
   // Calcular cidades na área usando useMemo
-  const cidadesNaArea = useMemo(() => {
-    if (!areaSelecionada) return [];
-
-    const bounds = L.latLngBounds(areaSelecionada.bounds);
-    return cidades.filter((cidade) => bounds.contains(L.latLng(cidade.lat, cidade.lng)));
-  }, [areaSelecionada, cidades]);
+  const cidadesNaArea = useMemo(
+    () => cidadesDentroDaArea(cidades, areaSelecionada?.bounds),
+    [areaSelecionada, cidades]
+  );
 
   // Handlers usando useCallback para evitar re-renders desnecessários
   const handleCidadeClick = useCallback((cidade) => {

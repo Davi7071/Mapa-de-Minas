@@ -1,148 +1,132 @@
 # 🗺️ Mapa da Saúde de Minas Gerais
 
-Um sistema interativo de mapeamento geográfico que permite visualizar e analisar as regionais de Minas Gerais, incluindo cidades próximas e informações demográficas.
+Mapa interativo dos **853 municípios de Minas Gerais** e das regionais de saúde,
+para visualizar quais cidades ficam dentro do raio de abrangência de cada
+regional.
 
 ## ✨ Funcionalidades
 
-### 🎯 Principais
-- **Mapa Interativo**: Visualização geográfica completa do estado de Minas Gerais
-- **Regionais**: 7 regionais estratégicas marcadas no mapa
-- **Cidades Próximas**: Sistema de busca automática de cidades próximas a cada regional
-- **Informações Demográficas**: População e dados das cidades
-- **Interface Responsiva**: Funciona em desktop e dispositivos móveis
+- **Todos os municípios do estado** com população do Censo 2022, microrregião e
+  mesorregião.
+- **7 regionais de saúde** com o seu raio de abrangência desenhado no mapa.
+- **Cidades próximas**: clique numa regional ou em qualquer cidade e veja a
+  lista das que caem dentro do raio, com a distância calculada por Haversine.
+- **Seleção por área**: desenhe um retângulo sobre o mapa e veja todas as
+  cidades contidas nele.
+- **Sem dependência de rede**: os dados são embarcados na aplicação, que carrega
+  instantaneamente e funciona offline.
 
-### 🎮 Interatividade
-- **Clique nas Regionais**: Selecione uma regional para ver cidades próximas
-- **Círculo de Abrangência**: Visualização do raio de cobertura de cada regional
-- **Painéis Informativos**: Dados detalhados em tempo real
-- **Marcadores Dinâmicos**: Diferentes tipos de marcadores para cidades e regionais
+## 🛠️ Tecnologias
 
-## 🛠️ Tecnologias Utilizadas
+- **React 19**
+- **Leaflet** e **react-leaflet 5** para o mapa
+- **Vite 7** como build tool
+- **Vitest** para os testes
+- Dados do **IBGE** (municípios e Censo 2022)
 
-- **React 18** - Framework principal
-- **Leaflet** - Biblioteca de mapas interativos
-- **Vite** - Build tool e servidor de desenvolvimento
-- **CSS3** - Estilização responsiva
-- **IBGE API** - Dados oficiais de municípios brasileiros
+## 🚀 Como executar
 
-## 🚀 Como Executar
+Pré-requisito: **Node.js 20.19+** (ou 22.12+).
 
-### Pré-requisitos
-- Node.js (versão 16 ou superior)
-- npm ou yarn
-
-### Instalação
-
-1. **Clone o repositório**
 ```bash
-git clone https://github.com/seu-usuario/mapa-saude-mg.git
-cd mapa-saude-mg
-```
-
-2. **Instale as dependências**
-```bash
+git clone https://github.com/Davi7071/Mapa-de-Minas.git
+cd Mapa-de-Minas
 npm install
-```
-
-3. **Execute o projeto**
-```bash
 npm run dev
 ```
 
-4. **Acesse no navegador**
-```
-http://localhost:5173
-```
+Acesse <http://localhost:5173>.
 
-## 📁 Estrutura do Projeto
+### Scripts
+
+| Script | O que faz |
+|---|---|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Build de produção em `dist/` |
+| `npm run preview` | Serve o build de produção |
+| `npm test` | Roda os testes |
+| `npm run lint` | Roda o ESLint |
+| `npm run dados` | Regenera `src/data/municipios-mg.json` |
+
+## 📊 Os dados
+
+`src/data/municipios-mg.json` é **versionado no repositório** e contém os 853
+municípios de MG. A aplicação não faz nenhuma requisição de rede para carregá-lo.
+
+O arquivo é gerado por `scripts/gerar-dados.mjs` (`npm run dados`), que cruza
+três fontes em três requisições:
+
+| Fonte | O que traz |
+|---|---|
+| IBGE — `localidades/estados/31/municipios` | nome, código, microrregião e mesorregião |
+| IBGE — agregado 4709, variável 93, 2022 | população (Censo 2022) |
+| [kelvins/municipios-brasileiros](https://github.com/kelvins/municipios-brasileiros) | coordenadas da sede municipal |
+
+O script aborta se algum município ficar sem coordenada ou sem população, para
+não gravar dado pela metade.
+
+Só é preciso rodá-lo de novo quando sair um novo Censo ou estimativa
+populacional, ou quando a malha municipal mudar.
+
+> **Por que a sede e não o centroide?** A malha do IBGE traz os polígonos dos
+> municípios, mas o centroide de um polígono chega a ficar 15 km da sede — o
+> suficiente para mudar quais cidades entram num raio de 50–70 km.
+
+> **Atenção ao trocar o ano.** Anos censitários usam o agregado 4709; anos não
+> censitários usam o 6579 (estimativas, variável 9324). O 6579 não devolve dados
+> em anos de Censo.
+
+## 📁 Estrutura
 
 ```
-mapa-saude-mg/
+Mapa-de-Minas/
+├── scripts/
+│   └── gerar-dados.mjs             # Gera o JSON dos municípios
 ├── src/
 │   ├── Components/
 │   │   ├── MapaComRegionais.jsx    # Componente principal do mapa
-│   │   └── MapaComRegionais.css    # Estilos do mapa
+│   │   └── MapaComRegionais.css
 │   ├── data/
-│   │   └── regionais.js            # Dados das regionais de saúde
-│   ├── services/
-│   │   └── ibgeService.js          # Serviços de API do IBGE
-│   ├── App.jsx                     # Componente raiz
-│   └── main.jsx                    # Ponto de entrada
-├── public/                         # Arquivos estáticos
-├── package.json                    # Dependências e scripts
-└── README.md                       # Este arquivo
+│   │   ├── municipios-mg.json      # 853 municípios (gerado)
+│   │   └── regionais.js            # Regionais de saúde e raio padrão
+│   ├── lib/
+│   │   ├── geo.js                  # Distância e filtros por raio/área
+│   │   └── geo.test.js
+│   ├── App.jsx
+│   └── main.jsx
+└── index.html
 ```
 
-## 🎯 Como Usar
+## 🎯 Como usar
 
-### Visualização Geral
-1. Abra o sistema no navegador
-2. O mapa carrega automaticamente com todas as cidades de Minas Gerais
-3. As regionais de saúde aparecem como marcadores amarelos com "R"
+1. **Clique numa regional** (marcador amarelo com "R") para ver as cidades
+   dentro do seu raio de abrangência.
+2. **Clique em qualquer cidade** (ponto azul) para ver as cidades num raio de
+   50 km.
+3. **Clique em "Desenhar Área"** e depois em dois pontos do mapa para delimitar
+   um retângulo; as cidades contidas nele aparecem na lista.
+4. **"Limpar"** desfaz a seleção.
 
-### Interação com Regionais
-1. **Clique em uma regional** (marcador amarelo)
-2. Um círculo azul aparece mostrando a área de abrangência
-3. As cidades próximas são destacadas automaticamente
-4. O painel lateral mostra informações detalhadas
+## 🗺️ Regionais
 
-### Informações Disponíveis
-- **Nome da Regional**: Identificação da regional de saúde
-- **Cidade Base**: Cidade principal da regional
-- **Cidades Próximas**: Lista de cidades dentro do raio de cobertura
-- **População**: Dados demográficos das cidades
-- **Distância**: Cálculo automático de distâncias
+Definidas em `src/data/regionais.js`, cada uma com cidade-base, coordenadas e
+raio próprio (hoje 70 km):
 
-## 📊 Dados Incluídos
+Divinópolis · Governador Valadares · Juiz de Fora · Montes Claros ·
+Poços de Caldas · Uberaba · Uberlândia
 
-### Regionais
-- **Belo Horizonte** - Regional Metropolitana
-- **Montes Claros** - Regional Norte
-- **Governador Valadares** - Regional Vale do Rio Doce
-- **Juiz de Fora** - Regional Zona da Mata
-- **Uberlândia** - Regional Triângulo Norte
-- **Uberaba** - Regional Triângulo Sul
-- **Divinópolis** - Regional Centro
-
-### Cidades (73+)
-- Todas as principais cidades de Minas Gerais
-- Coordenadas geográficas precisas
-- Dados de população atualizados
-- Informações de microrregião e mesorregião
-
-## 🔧 Configuração
-
-### Variáveis de Ambiente
-```bash
-# Não são necessárias variáveis de ambiente para execução local
-# As APIs utilizadas são públicas e não requerem autenticação
-```
-
-### Personalização
-- **Raio de Cobertura**: Ajuste em `src/Components/MapaComRegionais.jsx`
-- **Estilos**: Modifique `src/Components/MapaComRegionais.css`
-- **Dados**: Atualize `src/data/regionais.js`
+Para mudar a lista, o raio de cada regional ou o raio padrão de cidades avulsas
+(`RAIO_PADRAO_KM`), edite esse arquivo.
 
 ## 🚀 Deploy
 
-### Vercel (Recomendado)
-```bash
-npm run build
-# Conecte seu repositório ao Vercel
-```
+O build é um site estático em `dist/`, publicável em Vercel, Netlify, GitHub
+Pages ou qualquer servidor de arquivos.
 
-### Netlify
 ```bash
 npm run build
-# Faça upload da pasta dist/
-```
-
-### GitHub Pages
-```bash
-npm run build
-# Configure GitHub Actions para deploy automático
 ```
 
 ## 📝 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+MIT — veja [LICENSE](LICENSE).
