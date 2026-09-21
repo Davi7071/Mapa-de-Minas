@@ -1,3 +1,7 @@
+// Raio usado quando o usuário clica numa cidade avulsa, que não tem raio
+// próprio. Cada regional define o seu em `raioKm`.
+export const RAIO_PADRAO_KM = 50;
+
 export const REGIONAIS = [
   {
     nome: "Juiz de Fora",
